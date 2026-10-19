@@ -106,6 +106,27 @@
         // Desktop style: Render the game canvas in a window that can be maximized to fullscreen:
         canvas.style.width = "1024px";
         canvas.style.height = "960px";
+
+        // Keep the game's 1024x960 aspect ratio, but scale the complete
+        // Unity frame down when the browser viewport is smaller.
+        var unityContainer = document.querySelector("#unity-container");
+        function fitUnityContainer() {
+          var frameWidth = 1024;
+          var frameHeight = 998; // 960px canvas + 38px Unity footer
+          var margin = 32;
+          var scale = Math.min(
+            1,
+            (window.innerWidth - margin) / frameWidth,
+            (window.innerHeight - margin) / frameHeight
+          );
+
+          unityContainer.style.transform =
+            "translate(-50%, -50%) scale(" + scale + ")";
+          unityContainer.style.transformOrigin = "center center";
+        }
+
+        fitUnityContainer();
+        window.addEventListener("resize", fitUnityContainer);
       }
 
       document.querySelector("#unity-loading-bar").style.display = "block";
