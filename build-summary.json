@@ -1,0 +1,8 @@
+{
+  "result": "Succeeded",
+  "unityVersion": "6000.3.25f1",
+  "scenes": ["Dungeon", "GoldDungeon"],
+  "width": 1024,
+  "height": 960,
+  "totalBytes": 15256431
+}

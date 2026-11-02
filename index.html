@@ -6,7 +6,13 @@
     <title>Unity Web Player | 4980 Zelda_NES</title>
     <link rel="shortcut icon" href="TemplateData/favicon.ico">
     <link rel="stylesheet" href="TemplateData/style.css">
-  </head>
+  <style id="game-responsive-layout">
+html, body { width:100%; height:100%; margin:0; overflow:hidden; background:#101214; }
+#unity-container { position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); }
+#unity-canvas { display:block; background:#000; }
+#unity-footer { width:100%; box-sizing:border-box; }
+</style>
+</head>
   <body>
     <div id="unity-container" class="unity-desktop">
       <canvas id="unity-canvas" width=1024 height=960 tabindex="-1"></canvas>
@@ -52,16 +58,12 @@
       }
 
       var buildUrl = "Build";
-      var loaderUrl = buildUrl + "/WebGLBuild.loader.js?v=1024x960-20261019";
+      var loaderUrl = buildUrl + "/WebGL-20261102.loader.js";
       var config = {
         arguments: [],
-        // Keep the render buffer consistent with Unity's 1024x960 resolution.
-        // The container below handles visual scaling without changing that buffer.
-        matchWebGLToCanvasSize: false,
-        devicePixelRatio: 1,
-        dataUrl: buildUrl + "/WebGLBuild.data?v=1024x960-20261019",
-        frameworkUrl: buildUrl + "/WebGLBuild.framework.js?v=1024x960-20261019",
-        codeUrl: buildUrl + "/WebGLBuild.wasm?v=1024x960-20261019",
+        dataUrl: buildUrl + "/WebGL-20261102.data.unityweb",
+        frameworkUrl: buildUrl + "/WebGL-20261102.framework.js.unityweb",
+        codeUrl: buildUrl + "/WebGL-20261102.wasm.unityweb",
         streamingAssetsUrl: "StreamingAssets",
         companyName: "DefaultCompany",
         productName: "4980 Zelda_NES",
@@ -74,6 +76,13 @@
         //    return true;
         // },
       };
+
+      // By default, Unity keeps WebGL canvas render target size matched with
+      // the DOM size of the canvas element (scaled by window.devicePixelRatio)
+      // Set this to false if you want to decouple this synchronization from
+      // happening inside the engine, and you would instead like to size up
+      // the canvas DOM size and WebGL render target sizes yourself.
+      // config.matchWebGLToCanvasSize = false;
 
       // If you would like all file writes inside Unity Application.persistentDataPath
       // directory to automatically persist so that the contents are remembered when
@@ -103,27 +112,6 @@
         // Desktop style: Render the game canvas in a window that can be maximized to fullscreen:
         canvas.style.width = "1024px";
         canvas.style.height = "960px";
-
-        // Keep the game's 1024x960 aspect ratio, but scale the complete
-        // Unity frame down when the browser viewport is smaller.
-        var unityContainer = document.querySelector("#unity-container");
-        function fitUnityContainer() {
-          var frameWidth = 1024;
-          var frameHeight = 998; // 960px canvas + 38px Unity footer
-          var margin = 32;
-          var scale = Math.min(
-            1,
-            (window.innerWidth - margin) / frameWidth,
-            (window.innerHeight - margin) / frameHeight
-          );
-
-          unityContainer.style.transform =
-            "translate(-50%, -50%) scale(" + scale + ")";
-          unityContainer.style.transformOrigin = "center center";
-        }
-
-        fitUnityContainer();
-        window.addEventListener("resize", fitUnityContainer);
       }
 
       document.querySelector("#unity-loading-bar").style.display = "block";
@@ -147,5 +135,27 @@
       document.body.appendChild(script);
 
     </script>
-  </body>
+  <script>
+(function () {
+  function fitGameCanvas() {
+    var canvas = document.getElementById('unity-canvas');
+    var container = document.getElementById('unity-container');
+    var footer = document.getElementById('unity-footer');
+    if (!canvas || !container || document.fullscreenElement) return;
+    var footerHeight = footer && getComputedStyle(footer).display !== 'none' ? 38 : 0;
+    var scale = Math.min(1, (window.innerWidth - 16) / 1024, (window.innerHeight - footerHeight - 16) / 960);
+    scale = Math.max(0.1, scale);
+    var width = Math.floor(1024 * scale), height = Math.floor(960 * scale);
+    container.style.width = width + 'px';
+    canvas.style.width = width + 'px';
+    canvas.style.height = height + 'px';
+  }
+  window.addEventListener('resize', fitGameCanvas);
+  document.addEventListener('fullscreenchange', fitGameCanvas);
+  document.getElementById('unity-canvas').addEventListener('pointerdown', function () { this.focus(); });
+  fitGameCanvas();
+  setTimeout(fitGameCanvas, 1000);
+})();
+</script>
+</body>
 </html>
