@@ -55,6 +55,10 @@
       var loaderUrl = buildUrl + "/WebGLBuild.loader.js?v=1024x960-20261019";
       var config = {
         arguments: [],
+        // Keep the render buffer consistent with Unity's 1024x960 resolution.
+        // The container below handles visual scaling without changing that buffer.
+        matchWebGLToCanvasSize: false,
+        devicePixelRatio: 1,
         dataUrl: buildUrl + "/WebGLBuild.data?v=1024x960-20261019",
         frameworkUrl: buildUrl + "/WebGLBuild.framework.js?v=1024x960-20261019",
         codeUrl: buildUrl + "/WebGLBuild.wasm?v=1024x960-20261019",
@@ -70,13 +74,6 @@
         //    return true;
         // },
       };
-
-      // By default, Unity keeps WebGL canvas render target size matched with
-      // the DOM size of the canvas element (scaled by window.devicePixelRatio)
-      // Set this to false if you want to decouple this synchronization from
-      // happening inside the engine, and you would instead like to size up
-      // the canvas DOM size and WebGL render target sizes yourself.
-      // config.matchWebGLToCanvasSize = false;
 
       // If you would like all file writes inside Unity Application.persistentDataPath
       // directory to automatically persist so that the contents are remembered when
